@@ -15,20 +15,20 @@
  *
  * @section lacqueyFetch_install Installation
  * 
- * You need to program the firmware to the MBED <br>
+ * First you need to program the firmware to the MBED <br>
  * You can use the online compiler (https://os.mbed.com/compiler) to compile the firmware and stored it on the flash mbed memory<br>
  * Steps:
  * - Change the "id" of the device corresponding to the hand used (right-hand: ID 65, left-hand: ID 64) <br>
- * - Press "Compile" and save the .bin file on the flash memory <br>
+ * - Press "Compile" and save the .bin file on the flash mbed memory <br>
  * - If you want to check the correct functionality, you can connect the mbed to the serial USB and with a serial monitor program (configured with a baudrate of 115200), see the CAN messages information of the hand. <br>
  *
  *
- * @section lacqueyFetch_running Running (assuming correct installation)
+ * @section lacqueyFetch_running Running (assuming correct installation) 
  *
- * Running "launchManipulation" application, you can open or close the hand with this parameters (assuming you know how to run "launchManipulation"):
- * set pos 6 1  -> open hand
- * set pos 6 -1 -> close hand
- * set pos 6 0  -> loose hand   
+ * Running "launchManipulation" application, you can open or close the hand with this parameters (assuming you know how to run "launchManipulation"): <br>
+ * set pos 6 1  -> open hand  <br>
+ * set pos 6 -1 -> close hand <br>
+ * set pos 6 0  -> loose hand <br>  
  *
  **/
  
