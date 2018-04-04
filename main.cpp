@@ -26,9 +26,9 @@
  * @section lacqueyFetch_running Running (assuming correct installation) 
  *
  * Running "launchManipulation" application, you can open or close the hand with this parameters (assuming you know how to run "launchManipulation"): <br>
- * set pos 6 1  -> open hand  <br>
- * set pos 6 -1 -> close hand <br>
- * set pos 6 0  -> loose hand <br>  
+ * set pos 6 1200   -> open hand  <br>
+ * set pos 6 -1200  -> close hand <br>
+ * set pos 6 0      -> loose hand <br>  
  *
  **/
  
@@ -41,14 +41,14 @@ CAN can(p30, p29);         // tx,rx
 Motor m(p24, p26, p25);    // pwm, fwd, rev (PWM, REVERSE, FORDWARD)
 
 
-bool receive(signed char* order) {
+bool receive(char* order) {
     int8_t id = 65;     // right-hand: ID 65, left-hand: ID 64
-    signed char data;
+    char data;
     CANMessage msg;
         if( can.read(msg) ) {                                     
             if(id == (int8_t)msg.id){
                 pc.printf("Message received (ID: %d) (size: %d)\n", (int8_t)msg.id, msg.len);
-                data = msg.data[0];
+                data = msg.data[0] & 0b11110000;
                 *order = data;            
                 led1 = !led1;
                 return true;
@@ -67,13 +67,29 @@ int main() {
     can.reset(); 
     
     // message received
-    signed char data;
+    char data;
    
     while(1) {   
         
         if(receive(&data)) {
-            pc.printf("value received: %f\n", (double)data);
-            m.speed((double)data); 
+            pc.printf("value received: %x\n", data);
+            switch(data){
+            case 0xA0:  // open hand 
+                m.speed(1.0);
+                break;
+                
+            case 0xC0: // close hand 
+                m.speed(-1.0);
+                break;
+                
+            case 0xF0: // loose hand
+                m.speed(0.0);
+                break;
+                
+            default:   // loose hand
+                m.speed(0.0);
+                break;
+            }            
         }  
     }
 }
