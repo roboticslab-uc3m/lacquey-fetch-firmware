@@ -20,6 +20,7 @@
  * Steps:
  * - Change the "id" of the device corresponding to the hand used (right-hand: ID 65, left-hand: ID 64) <br>
  * - Press "Compile" and save the .bin file on the flash mbed memory <br>
+ 
  * - If you want to check the correct functionality, you can connect the mbed to the serial USB and with a serial monitor program (configured with a baudrate of 115200), see the CAN messages information of the hand. <br>
  *
  *
@@ -39,21 +40,23 @@ Serial pc(USBTX, USBRX);   // Serial connection
 DigitalOut led1(LED1);     // received
 CAN can(p30, p29);         // tx,rx
 Motor m(p24, p26, p25);    // pwm, fwd, rev (PWM, REVERSE, FORDWARD)
+const uint8_t id = 64;     // right-hand: ID 65, left-hand: ID 64
 
-
-bool receive(char* order) {
-    int8_t id = 65;     // right-hand: ID 65, left-hand: ID 64
-    char data;
+bool receive(float* value) {
     CANMessage msg;
-        if( can.read(msg) ) {                                     
-            if(id == (int8_t)msg.id){
-                pc.printf("Message received (ID: %d) (size: %d)\n", (int8_t)msg.id, msg.len);
-                data = msg.data[0] & 0b11110000;
-                *order = data;            
+    
+    if( can.read(msg) ) {                                     
+        if(id == (uint8_t)msg.id) {
+            pc.printf("Message received (ID: %d) (size: %d)\n", (int8_t)msg.id, msg.len);
+
+            if(msg.len == 4) {
+                pc.printf("Message received %x %x %x %x\n", msg.data[0], msg.data[1], msg.data[2], msg.data[3]);
+                *value = *((float*)msg.data);
                 led1 = !led1;
                 return true;
             }
-        } 
+        }
+    } 
         
     return false;    
 }
@@ -67,29 +70,15 @@ int main() {
     can.reset(); 
     
     // message received
-    char data;
+    float data;    
    
-    while(1) {   
-        
+    while(1) {  
         if(receive(&data)) {
-            pc.printf("value received: %x\n", data);
-            switch(data){
-            case 0xA0:  // open hand 
-                m.speed(1.0);
-                break;
-                
-            case 0xC0: // close hand 
-                m.speed(-1.0);
-                break;
-                
-            case 0xF0: // loose hand
-                m.speed(0.0);
-                break;
-                
-            default:   // loose hand
-                m.speed(0.0);
-                break;
-            }            
+            pc.printf("value received: %5.2f\n", data);
+            
+            if (data >= -100.0f && data <= 100.0f) {
+                m.speed(data/100.0f);
+            }
         }  
     }
 }
