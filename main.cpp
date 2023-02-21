@@ -8,7 +8,7 @@
 
 Serial pc(USBTX, USBRX);
 DigitalOut led1(LED1);
-CAN can(p30, p29); // tx,rx
+CAN can(p30, p29); // rd, td
 Motor m(p22, p23, p24); // pwm, fwd, rev
 const unsigned int id = 64; // right-hand: ID 65, left-hand: ID 64
 
